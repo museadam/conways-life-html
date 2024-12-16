@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Game of Life</title>
+    <style>
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(30, 10px);
+        grid-template-rows: repeat(30, 10px);
+      }
+
+      .cell {
+        width: 10px;
+        height: 10px;
+        border: 1px solid #ccc;
+        background-color: white;
+      }
+
+      .alive {
+        background-color: black;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="grid" id="grid"></div>
+
+    <script>
+      const gridSize = 30;
+      const grid = document.getElementById("grid");
+
+      // Create the grid
+      for (let i = 0; i < gridSize * gridSize; i++) {
+        const cell = document.createElement("div");
+        cell.classList.add("cell");
+        grid.appendChild(cell);
+      }
+
+      // Get all cells
+      const cells = document.querySelectorAll(".cell");
+
+      // Initialize random starting state (optional)
+      cells.forEach((cell) => {
+        if (Math.random() < 0.2) {
+          cell.classList.add("alive");
+        }
+      });
+
+      // Game of Life logic
+      function updateGrid() {
+        const nextGrid = Array.from({ length: gridSize }, () =>
+          Array(gridSize).fill(0)
+        );
+
+        for (let row = 0; row < gridSize; row++) {
+          for (let col = 0; col < gridSize; col++) {
+            const cellIndex = row * gridSize + col;
+            const currentCell = cells[cellIndex];
+            let aliveNeighbors = 0;
+
+            // Check neighbors
+            for (let i = -1; i <= 1; i++) {
+              for (let j = -1; j <= 1; j++) {
+                const neighborRow = row + i;
+                const neighborCol = col + j;
+
+                if (
+                  neighborRow >= 0 &&
+                  neighborRow < gridSize &&
+                  neighborCol >= 0 &&
+                  neighborCol < gridSize &&
+                  !(i === 0 && j === 0)
+                ) {
+                  const neighborIndex = neighborRow * gridSize + neighborCol;
+                  if (cells[neighborIndex].classList.contains("alive")) {
+                    aliveNeighbors++;
+                  }
+                }
+              }
+            }
+
+            // Apply rules
+            if (currentCell.classList.contains("alive")) {
+              if (aliveNeighbors < 2 || aliveNeighbors > 3) {
+                nextGrid[row][col] = 0; // Dies
+              } else {
+                nextGrid[row][col] = 1; // Lives
+              }
+            } else {
+              if (aliveNeighbors === 3) {
+                nextGrid[row][col] = 1; // Becomes alive
+              } else {
+                nextGrid[row][col] = 0; // Remains dead
+              }
+            }
+          }
+        }
+
+        // Update grid
+        for (let row = 0; row < gridSize; row++) {
+          for (let col = 0; col < gridSize; col++) {
+            const cellIndex = row * gridSize + col;
+            if (nextGrid[row][col] === 1) {
+              cells[cellIndex].classList.add("alive");
+            } else {
+              cells[cellIndex].classList.remove("alive");
+            }
+          }
+        }
+      }
+
+      // Start the game loop
+      setInterval(updateGrid, 100); // Update every 100 milliseconds
+    </script>
+  </body>
+</html>
